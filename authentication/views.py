@@ -6,16 +6,16 @@ from django.conf import settings
 from django.contrib import auth
 import jwt
 
-from .serializers import UserSerializers
+from .serializers import UserSerializer, LoginSerializer
 
 
 # Create your views here.
 
 class RegisterView(GenericAPIView):
-    serializer_class = UserSerializers
+    serializer_class = UserSerializer
 
     def post(self, request):
-        serializer = UserSerializers(data=request.data)
+        serializer = UserSerializer(data=request.data)
         if serializer.is_valid():
             serializer.save()
 
@@ -29,6 +29,7 @@ class RegisterView(GenericAPIView):
 
 
 class LoginView(GenericAPIView):
+    serializer_class = LoginSerializer
 
     def post(self, request):
         data = request.data
@@ -39,7 +40,7 @@ class LoginView(GenericAPIView):
         if user:
             auth_token = jwt.encode({'username': user.username}, settings.JWT_SECRET_KEY)
 
-            serializer = UserSerializers(user)
+            serializer = UserSerializer(user)
 
             data = {
                 'payload': serializer.data,
